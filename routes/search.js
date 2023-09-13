@@ -8,7 +8,7 @@ const Users = require("../models/user");
 const Providers = require("../models/provider");
 const Services = require("../models/services")
 
-router.get("/location", verify, async(req,res)=>
+router.get("/location/:service/:longitude/:latitude", verify, async(req,res)=>
 {
   const {service, longitude, latitude} = req.params;
   
@@ -35,7 +35,7 @@ router.get("/location", verify, async(req,res)=>
       });
 })
 
-router.get("/city", verify,async(req,res)=>
+router.get("/city/:city/:service", verify,async(req,res)=>
 {
   // let user = null;
   // user = await Users.findOneById(req._id);
