@@ -10,14 +10,7 @@ const Services = require("../models/services")
 
 router.get("/location", verify, async(req,res)=>
 {
-  const body = req.body;
-  const userId = req._id;
-
-  let user = null;
-  user = await Users.findOneById(userId);
-
-  const { coordinates } = user.location;
-  const [longitude, latitude] = coordinates;
+  const {service, longitude, latitude} = req.params;
   
   Providers
       .find({
@@ -30,6 +23,7 @@ router.get("/location", verify, async(req,res)=>
             $maxDistance: 5000, // 5 kilometers in meters
           },
         },
+        services: { $in: [service] }
       })
       .toArray((err, locations) => {
         if (err) {
@@ -39,6 +33,27 @@ router.get("/location", verify, async(req,res)=>
           res.status(200).json(locations);
         }
       });
+})
+
+router.get("/city", verify,async(req,res)=>
+{
+  // let user = null;
+  // user = await Users.findOneById(req._id);
+
+  const {city, service} = req.params;
+
+  let providers = null;
+
+  providers = await Providers.find({city: city, services: { $in: [service] }})
+
+  if(providers)
+  {
+    res.status(200).json(providers)
+  }
+  else
+  {
+    res.status(400).send("No providers found");
+  }
 })
 
 module.exports = router;
