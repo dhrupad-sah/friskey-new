@@ -155,4 +155,10 @@ router.get("/all", verify, (req, res) => {
     });
 });
 
+router.get("/logout", (req, res) => {
+    res.clearCookie("petlevert");
+    req._id = null;
+    return res.status(200).json({ message: "Logged out!!" });
+});
+
 module.exports = router;

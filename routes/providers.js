@@ -33,6 +33,7 @@ router.post("/register", async (req, res) => {
         petParent: body.petParent,
         pincode: body.pincode,
         location: {
+          type: 'Point',
           coordinates: [body.longitude, body.latitude],
         },
       });
