@@ -46,6 +46,9 @@ const providerSchema = new mongoose.Schema({
   },
 
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Services" }],
+
+  servicesList : [String],
+
   image: {
     type: String,
     required: false,

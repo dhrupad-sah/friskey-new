@@ -85,7 +85,13 @@ router.post("/details", verify, (req, res) => {
           note: body.note,
           petType: [body.type],
         });
-        return service.save();
+         service.save().then((doc)=>
+         {
+          data.services.push(doc._id);
+          data.servicesList.push(doc.serviceType);
+
+          return data.save();
+         })
       })
       .then((result) => {
         res.status(200).send("Added in Database");
