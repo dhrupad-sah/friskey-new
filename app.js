@@ -24,11 +24,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "https://golden-zabaione-725504.netlify.app",
-            "*",
-        ],
+        origin: ["http://localhost:3000", "https://freskei.netlify.app", "*"],
         methods: ["POST", "GET", "HEAD", "PUT", "DELETE"],
         credentials: true,
     })
