@@ -36,21 +36,15 @@ router.post("/register", async (req, res) => {
                 city: body.city,
                 petParent: body.petParent,
                 location: {
-                    type: 'Point',
-                    coordinates: [parseFloat(body.longitude), parseFloat(body.latitude)],
-                  },
+                    type: "Point",
+                    coordinates: [
+                        parseFloat(body.longitude),
+                        parseFloat(body.latitude),
+                    ],
+                },
             });
 
             user.save().then((docs) => {
-                const token = jwt.sign(
-                    {
-                        email: docs.email,
-                        userId: docs._id.toString(),
-                        type: "user",
-                    },
-                    process.env.TOKEN_SECRET_KEY,
-                    { expiresIn: "5h" }
-                );
                 res.status(200).send("Registred sucessfuly");
             });
         });
@@ -70,7 +64,7 @@ router.post("/login", async (req, res) => {
                         const token = jwt.sign(
                             {
                                 id: docs._id.toString(),
-                                type:'user'
+                                type: "user",
                             },
                             process.env.TOKEN_SECRET_KEY,
                             { expiresIn: "5h" }
@@ -95,34 +89,52 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/review", verify, (req, res) => {
-  const body = req.body;
-  const user_id = req._id;
-  const provider_id = body.provider_id;
-  const rating = body.rating;
-  const review = body.review;
-  Reviews.findOne({ user_id: user_id, provider_id: provider_id })
-    .then((doc) => {
-      if (!doc) {
-        const Review = new Reviews({
-          rating: rating,
-          review: review,
-          user_id: user_id,
-          provider_id: provider_id,
-          verify: false,
+    const body = req.body;
+    const user_id = req._id;
+    const provider_id = body.provider_id;
+    const rating = body.rating;
+    const review = body.review;
+    Reviews.findOne({ user_id: user_id, provider_id: provider_id })
+        .then((doc) => {
+            if (!doc) {
+                const Review = new Reviews({
+                    rating: rating,
+                    review: review,
+                    user_id: user_id,
+                    provider_id: provider_id,
+                    verify: false,
+                });
+                return Review.save();
+            }
+            doc.rating = rating;
+            doc.review = review;
+            return doc.save();
+        })
+        .then((modified) => {
+            console.log(modified);
+            res.status(202).send("review saved sucessfully");
+        })
+        .catch((err) => {
+            res.status(500).send("error saving rating");
         });
-        return Review.save();
-      }
-      doc.rating = rating;
-      doc.review = review;
-      return doc.save();
-    })
-    .then((modified) => {
-      console.log(modified);
-      res.status(202).send("review saved sucessfully");
-    })
-    .catch((err) => {
-      res.status(500).send("error saving rating");
-    });
+});
+
+router.post("/updateimage", verify, async (req, res) => {
+    console.log("update image");
+    const { image } = req.body;
+    let user = null;
+    try {
+        user = await Users.findById(req._id).exec();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    user.image = image;
+    try {
+        await user.save();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    return res.status(200).json({ message: "Image updated successfully!" });
 });
 
 router.get("/info", verify, async (req, res) => {

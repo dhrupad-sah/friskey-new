@@ -49,8 +49,9 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
-        provider.type = 'provider';
-        return res.status(200).json(provider);
+        provider.type = "provider";
+        var modified_provider = { ...provider._doc, type: "provider" };
+        return res.status(200).json(modified_provider);
     }
     if (req._type === "user") {
         let user = null;
@@ -60,8 +61,9 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
-        user.type = 'user';
-        return res.status(200).json(user);
+        var modified_user = { ...user._doc, type: "user" };
+        console.log(modified_user);
+        return res.status(200).json(modified_user);
     }
 });
 app.use("/users", userRouter);
