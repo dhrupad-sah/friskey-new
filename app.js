@@ -7,7 +7,9 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users");
 const providerRouter = require("./routes/providers");
 const searchRouter = require("./routes/search");
-
+const verify = require("./middleware/auth");
+const Providers = require("./models/provider");
+const Users = require("./models/user");
 mongoose
     .connect(process.env.MONGO_URL)
     .then(() => console.log("DB connection successfull"))
@@ -37,11 +39,30 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
     res.status(200).send("API working");
 });
-
-app.get("/test", (req, res) => {
-    res.send([]);
+app.get("/check", verify, async (req, res) => {
+    const id = req._id;
+    console.log(req._type);
+    if (req._type === "provider") {
+        var provider = null;
+        provider = await Providers.findById(req._id).exec();
+        if (!provider) {
+            return res.status(404).json({
+                message: "User Not Found",
+            });
+        }
+        return res.status(200).json(provider);
+    }
+    if (req._type === "user") {
+        let user = null;
+        user = await Users.findById(req._id).exec();
+        if (!user) {
+            return res.status(404).json({
+                message: "User Not Found",
+            });
+        }
+        return res.status(200).json(user);
+    }
 });
-
 app.use("/users", userRouter);
 app.use("/providers", providerRouter);
 app.use("/search", searchRouter);

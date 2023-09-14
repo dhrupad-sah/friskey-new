@@ -16,20 +16,6 @@ const saltRounds = 10;
 mongoose.set("strictQuery", true);
 mongoose.set("strictQuery", true);
 
-router.get("/check", verify, async (req, res) => {
-    console.log(req._id);
-    console.log(req._type);
-    let user = null;
-    user = await Users.findById(req._id).exec();
-
-    if (!user) {
-        return res.status(404).json({
-            message: "User Not Found",
-        });
-    }
-    return res.status(200).json(user);
-});
-
 router.post("/register", async (req, res) => {
     const body = req.body;
 
@@ -93,6 +79,7 @@ router.post("/login", async (req, res) => {
                             httpOnly: true,
                             sameSite: "none",
                             secure: true,
+                            type: "user",
                             maxAge: 24 * 60 * 60 * 1000,
                         });
                         res.status(200).send(docs);

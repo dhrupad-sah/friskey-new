@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
     // jwt verify function, validates the user's token
     jwt.verify(token, String(process.env.TOKEN_SECRET_KEY), (err, decoded) => {
         if (err) return res.status(401).json({ message: "please login again" }); //invalid token
+        console.log(decoded);
         req._id = decoded.id;
         req._type = decoded.type;
         next();
