@@ -12,6 +12,20 @@ const Services = require("../models/services");
 
 const saltRounds = 10;
 
+router.get("/check", verify, async (req, res) => {
+  let user = null;
+  const id = req._id;
+  console.log(req._type);
+  user = await Users.findById(req._id).exec();
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User Not Found",
+    });
+  }
+  return res.status(200).json(user);
+});
+
 router.post("/register", async (req, res) => {
   const body = req.body;
 
@@ -33,17 +47,17 @@ router.post("/register", async (req, res) => {
         petParent: body.petParent,
         pincode: body.pincode,
         location: {
-          type: 'Point',
+          type: "Point",
           coordinates: [body.longitude, body.latitude],
         },
       });
-
 
       provider.save().then((docs) => {
         const token = jwt.sign(
           {
             email: docs.email,
             userId: docs._id.toString(),
+            type: "provider",
           },
           process.env.TOKEN_SECRET_KEY,
           { expiresIn: "5h" }
@@ -85,13 +99,12 @@ router.post("/details", verify, (req, res) => {
           note: body.note,
           petType: [body.type],
         });
-         service.save().then((doc)=>
-         {
+        service.save().then((doc) => {
           data.services.push(doc._id);
           data.servicesList.push(doc.serviceType);
 
           return data.save();
-         })
+        });
       })
       .then((result) => {
         res.status(200).send("Added in Database");

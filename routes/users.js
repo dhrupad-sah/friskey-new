@@ -18,6 +18,7 @@ mongoose.set("strictQuery", true);
 
 router.get("/check", verify, async (req, res) => {
     console.log(req._id);
+    console.log(req._type);
     let user = null;
     user = await Users.findById(req._id).exec();
 
@@ -59,6 +60,7 @@ router.post("/register", async (req, res) => {
                     {
                         email: docs.email,
                         userId: docs._id.toString(),
+                        type: "user",
                     },
                     process.env.TOKEN_SECRET_KEY,
                     { expiresIn: "5h" }
