@@ -41,7 +41,6 @@ app.get("/", (req, res) => {
 });
 app.get("/check", verify, async (req, res) => {
     const id = req._id;
-    console.log(req._type);
     if (req._type === "provider") {
         var provider = null;
         provider = await Providers.findById(req._id).exec();

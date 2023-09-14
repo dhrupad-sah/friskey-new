@@ -51,7 +51,6 @@ router.post("/register", async (req, res) => {
                     process.env.TOKEN_SECRET_KEY,
                     { expiresIn: "5h" }
                 );
-
                 res.status(200).send("Registred sucessfuly");
             });
         });
@@ -71,6 +70,7 @@ router.post("/login", async (req, res) => {
                         const token = jwt.sign(
                             {
                                 id: docs._id.toString(),
+                                type:'user'
                             },
                             process.env.TOKEN_SECRET_KEY,
                             { expiresIn: "5h" }
