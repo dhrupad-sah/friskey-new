@@ -50,6 +50,7 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
+        provider.type = 'provider';
         return res.status(200).json(provider);
     }
     if (req._type === "user") {
@@ -60,6 +61,7 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
+        user.type = 'user';
         return res.status(200).json(user);
     }
 });
