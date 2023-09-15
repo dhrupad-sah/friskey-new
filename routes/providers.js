@@ -37,23 +37,8 @@ router.post("/register", async (req, res) => {
                     coordinates: [body.longitude, body.latitude],
                 },
             });
-
             provider.save().then((docs) => {
-                const token = jwt.sign(
-                    {
-                        email: docs.email,
-                        userId: docs._id.toString(),
-                        type: "provider",
-                    },
-                    process.env.TOKEN_SECRET_KEY,
-                    { expiresIn: "5h" }
-                );
-
-                res.status(200).send({
-                    token: token,
-                    userId: docs._id.toString(),
-                    expiresIn: "18000",
-                });
+                res.status(200).send("registered Sucessfully");
             });
         });
     }
@@ -115,18 +100,21 @@ router.post("/login", async (req, res) => {
                     if (result) {
                         const token = jwt.sign(
                             {
-                                providerId: docs._id.toString(),
+                                id: docs._id.toString(),
                                 type: "provider",
                             },
                             process.env.TOKEN_SECRET_KEY,
                             { expiresIn: "5h" }
                         );
 
-                        res.status(200).send({
-                            token: token,
-                            userId: docs._id.toString(),
-                            expiresIn: "18000",
+                        res.cookie("petlevert", token, {
+                            httpOnly: true,
+                            sameSite: "none",
+                            secure: true,
+                            type: "user",
+                            maxAge: 24 * 60 * 60 * 1000,
                         });
+                        res.status(200).send(docs);
                     } else {
                         res.send("Password or mobileNum Incorrect");
                     }

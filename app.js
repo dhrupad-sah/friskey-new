@@ -24,11 +24,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "https://golden-zabaione-725504.netlify.app",
-            "*",
-        ],
+        origin: ["http://localhost:3000", "https://freskei.netlify.app", "*"],
         methods: ["POST", "GET", "HEAD", "PUT", "DELETE"],
         credentials: true,
     })
@@ -41,7 +37,6 @@ app.get("/", (req, res) => {
 });
 app.get("/check", verify, async (req, res) => {
     const id = req._id;
-    console.log(req._type);
     if (req._type === "provider") {
         var provider = null;
         provider = await Providers.findById(req._id).exec();
@@ -50,8 +45,9 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
-        provider.type = 'provider';
-        return res.status(200).json(provider);
+        provider.type = "provider";
+        var modified_provider = { ...provider._doc, type: "provider" };
+        return res.status(200).json(modified_provider);
     }
     if (req._type === "user") {
         let user = null;
@@ -61,8 +57,9 @@ app.get("/check", verify, async (req, res) => {
                 message: "User Not Found",
             });
         }
-        user.type = 'user';
-        return res.status(200).json(user);
+        var modified_user = { ...user._doc, type: "user" };
+        console.log(modified_user);
+        return res.status(200).json(modified_user);
     }
 });
 app.use("/users", userRouter);

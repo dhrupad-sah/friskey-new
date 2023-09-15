@@ -1,43 +1,45 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-
     name: {
-        type: String
+        type: String,
     },
 
     mobileNum: {
-        type: String
+        type: String,
     },
 
     email: {
-        type: String
+        type: String,
     },
 
     password: {
-        type: String
+        type: String,
     },
 
     city: {
-        type: String
+        type: String,
     },
 
     petParent: {
-        type: String  
+        type: String,
     },
-
+    image: {
+        type: String,
+        required: false,
+    },
     location: {
         type: {
-          type: String,
-          enum: ['Point'], // Only "Point" type is allowed for geospatial data
-          required: true,
+            type: String,
+            enum: ["Point"], // Only "Point" type is allowed for geospatial data
+            required: true,
         },
         coordinates: {
-          type: [Number], // Longitude and latitude
-          required: true,
+            type: [Number], // Longitude and latitude
+            required: true,
         },
-      },
-})
+    },
+});
 
 const Users = new mongoose.model("Users", userSchema);
 
