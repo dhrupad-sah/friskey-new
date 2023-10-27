@@ -174,6 +174,20 @@ router.post("/updateimage", verify, async (req, res) => {
   return res.status(200).json({ message: "Image updated successfully!" });
 });
 
+router.get("/serviceDashboard", verify, async (req, res)=>
+{
+    const services = await Services.find({providersId: req._id});
+
+    if(services)
+    {
+        res.status(200).send(services);
+    }
+    else
+    {
+        res.status(404).send("No SERVICES found!!")
+    }
+})
+
 router.get("/all", verify, (req, res) => {
   Providers.find({}).then((docs) => {
     res.status(200).json(docs);
