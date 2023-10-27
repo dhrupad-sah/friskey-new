@@ -114,7 +114,8 @@ router.post("/login", async (req, res) => {
                             type: "provider",
                             maxAge: 24 * 60 * 60 * 1000,
                         });
-                        res.status(200).send(docs);
+                        const updatedDoc = { ...docs._doc, type: "provider" };
+                        res.status(200).send(updatedDoc);
                     } else {
                         res.send("Password or mobileNum Incorrect");
                     }
