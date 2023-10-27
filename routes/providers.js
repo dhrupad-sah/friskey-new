@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     const userAlready = await Providers.findOne({ email: email });
 
     if (userAlready) {
-        res.status(403).send("Provider already exists");
+        res.status(403).send({ message: "user already exits!" });
     } else {
         bcrypt.hash(body.password, saltRounds, function (err, hash) {
             const provider = new Providers({
@@ -111,7 +111,7 @@ router.post("/login", async (req, res) => {
                             httpOnly: true,
                             sameSite: "none",
                             secure: true,
-                            type: "user",
+                            type: "provider",
                             maxAge: 24 * 60 * 60 * 1000,
                         });
                         res.status(200).send(docs);
@@ -124,6 +124,61 @@ router.post("/login", async (req, res) => {
         .catch((err) => {
             res.status(400).send("Provider not registered");
         });
+});
+router.post("/updateinfo", verify, async (req, res) => {
+    console.log("update account");
+
+    const body = req.body;
+    console.log(req._id, req.body);
+    let user = null;
+    try {
+        user = await Providers.findById(req._id).exec();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    user.name = body.name;
+    user.mobileNum = body.mobileNumber;
+    user.email = body.email;
+    user.city = body.city;
+    user.petParent = body.petParent;
+    const passwordCompare = await bcrypt.compare(
+        body.currentPassword,
+        user.password
+    );
+    if (!passwordCompare) {
+        return res.status(409).json({
+            message: "Wrong password entered : Cannot edit account details!",
+        });
+    }
+    if (body.newPassword && body.newPassword.length > 0) {
+        const hashedPassword = bcrypt.hashSync(body.newPassword, 10);
+        user.password = hashedPassword;
+    }
+    try {
+        await user.save();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    const updatedDoc = { ...user._doc, type: "provider" };
+    return res.status(200).json(updatedDoc);
+});
+
+router.post("/updateimage", verify, async (req, res) => {
+    console.log("update image");
+    const { image } = req.body;
+    let user = null;
+    try {
+        user = await Providers.findById(req._id).exec();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    user.image = image;
+    try {
+        await user.save();
+    } catch (err) {
+        return res.status(500).json({ message: "Internal error occurred!" });
+    }
+    return res.status(200).json({ message: "Image updated successfully!" });
 });
 
 router.get("/all", verify, (req, res) => {
