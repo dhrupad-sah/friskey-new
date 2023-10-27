@@ -64,11 +64,11 @@ router.post("/details", verify, (req, res) => {
         Providers.findOne({ _id: provider_id })
             .then((data) => {
                 const service = new Services({
-                    serviceType: body.service,
+                    serviceType: body.serviceType,
                     providersId: data._id,
-                    price: body.price,
+                    price: body.currency + body.price,
                     note: body.note,
-                    petType: [body.type],
+                    petType: [body.petType],
                 });
                 service.save().then((doc) => {
                     data.services.push(doc._id);
