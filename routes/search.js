@@ -9,10 +9,10 @@ const Providers = require("../models/provider");
 const Services = require("../models/services");
 
 router.get(
-    "/location/:service/:longitude/:latitude",
+    "/:service/:longitude/:latitude/:distance",
     verify,
     async (req, res) => {
-        const { service, longitude, latitude } = req.params;
+        const { service, longitude, latitude, distance } = req.params;
         console.log(req.params);
         Providers.find({
             location: {
@@ -24,7 +24,7 @@ router.get(
                             parseFloat(latitude),
                         ],
                     },
-                    $maxDistance: 5000, // 5 kilometers in meters
+                    $maxDistance: (Number(distance)*1000), // 5 kilometers in meters
                 },
             },
             servicesList: { $in: [service] },
