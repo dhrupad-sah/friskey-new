@@ -78,7 +78,7 @@ router.post("/details", verify, async (req, res) => {
 
     const updatedProvider = await provider.save();
 
-    return newService;
+    return res.status(200).send(newService);
   } catch (err) {
     res.status(400).send(err);
   }
