@@ -74,11 +74,12 @@ router.post("/details", verify, (req, res) => {
                     data.services.push(doc._id);
                     data.servicesList.push(doc.serviceType);
 
-                    return data.save();
+                    data.save();
+                    return doc;
                 });
             })
             .then((result) => {
-                res.status(200).send("Added in Database");
+                res.status(200).send(result);
             })
             .catch((err) => {
                 res.status(400).send(err);
