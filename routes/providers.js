@@ -66,16 +66,15 @@ router.post("/details", verify, (req, res) => {
                 const service = new Services({
                     serviceType: body.serviceType,
                     providersId: data._id,
-                    price: body.currency + body.price,
+                    price: body.currency + " " +  body.price,
                     note: body.note,
                     petType: [body.petType],
                 });
-                service.save().then((doc) => {
+                return service.save().then((doc) => {
                     data.services.push(doc._id);
                     data.servicesList.push(doc.serviceType);
 
                     data.save();
-                    return doc;
                 });
             })
             .then((result) => {
