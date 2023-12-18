@@ -65,7 +65,12 @@ const providerSchema = new mongoose.Schema({
       type: mongoose.Types.ObjectId, ref: "Reviews",
       required: false
     }
-  ]
+  ],
+
+  hostType: [{
+    type: String,
+    required: false
+  }]
 
 });
 
