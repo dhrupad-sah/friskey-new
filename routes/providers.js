@@ -29,6 +29,8 @@ router.post("/register", async (req, res) => {
         email: body.email,
         password: hash,
         gender: body.gender,
+        country: body.city,
+        state: body.state,
         city: body.city,
         petParent: body.petParent,
         pincode: body.pincode,
@@ -133,6 +135,8 @@ router.post("/updateinfo", verify, async (req, res) => {
   user.mobileNum = body.mobileNumber;
   user.email = body.email;
   user.city = body.city;
+  user.state = body.state;
+  user.country = body.country;
   user.petParent = body.petParent;
   const passwordCompare = await bcrypt.compare(
     body.currentPassword,
@@ -174,18 +178,15 @@ router.post("/updateimage", verify, async (req, res) => {
   return res.status(200).json({ message: "Image updated successfully!" });
 });
 
-router.get("/serviceDashboard", verify, async (req, res)=>
-{
-    const services = await Services.find({providersId: req._id});
+router.get("/serviceDashboard", verify, async (req, res) => {
+  const services = await Services.find({ providersId: req._id });
 
-    if(services)
-    {
-        res.status(200).send(services);
-    }
-    else
-    {
-        res.status(404).send("No SERVICES found!!")
-    }
+  if (services) {
+    res.status(200).send(services);
+  }
+  else {
+    res.status(404).send("No SERVICES found!!")
+  }
 })
 
 router.get("/all", verify, (req, res) => {

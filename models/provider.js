@@ -24,6 +24,12 @@ const providerSchema = new mongoose.Schema({
   city: {
     type: String,
   },
+  country: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
 
   petParent: {
     type: String,
@@ -47,7 +53,7 @@ const providerSchema = new mongoose.Schema({
 
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Services" }],
 
-  servicesList : [String],
+  servicesList: [String],
 
   image: {
     type: String,
