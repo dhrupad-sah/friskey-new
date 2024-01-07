@@ -31,14 +31,6 @@ function generateResetToken() {
   });
 }
 
-//   generateResetToken()
-//   .then((token) => {
-//     console.log('Password reset token:', token);
-//   })
-//   .catch((error) => {
-//     console.error('Error generating token:', error);
-//   });
-
 router.post("/register", async (req, res) => {
   const body = req.body;
 
@@ -46,76 +38,78 @@ router.post("/register", async (req, res) => {
 
   const userAlready = await Users.findOne({ email: email });
 
-    if (userAlready) {
-        res.status(403).send("User already exists");
-    } else {
-        bcrypt.hash(body.password, saltRounds, function (err, hash) {
-            const user = new Users({
-                name: body.name,
-                mobileNum: body.mobileNum,
-                email: body.email,
-                password: hash,
-                gender: body.gender,
-                city: body.city,
-                petParent: body.petParent,
-                location: {
-                    type: "Point",
-                    coordinates: [
-                        parseFloat(body.longitude),
-                        parseFloat(body.latitude),
-                    ],
-                },
-            });
+  if (userAlready) {
+    res.status(403).send("User already exists");
+  } else {
+    bcrypt.hash(body.password, saltRounds, function (err, hash) {
+      const user = new Users({
+        name: body.name,
+        mobileNum: body.mobileNum,
+        email: body.email,
+        password: hash,
+        gender: body.gender,
+        city: body.city,
+        country: body.country,
+        state: body.state,
+        petParent: body.petParent,
+        location: {
+          type: "Point",
+          coordinates: [
+            parseFloat(body.longitude),
+            parseFloat(body.latitude),
+          ],
+        },
+      });
 
-            user.save().then((docs) => {
-                res.status(200).send("Registred sucessfuly");
-            });
-        });
-    }
+      user.save().then((docs) => {
+        res.status(200).send("Registred sucessfuly");
+      });
+    });
+  }
 });
 
 router.post("/login", async (req, res) => {
   const body = req.body;
 
-    Users.findOne({ email: body.email })
-        .then((docs) => {
-            if (!docs) {
-                return res.status(400).json({
-                    message:
-                        "Account not Found. Please try creating an account",
-                });
-            }
-            bcrypt.compare(
-                body.password,
-                docs.password,
-                function (err, result) {
-                    if (result) {
-                        const token = jwt.sign(
-                            {
-                                id: docs._id.toString(),
-                                type: "user",
-                            },
-                            process.env.TOKEN_SECRET_KEY,
-                            { expiresIn: "5h" }
-                        );
-                        res.cookie("petlevert", token, {
-                            httpOnly: true,
-                            sameSite: "none",
-                            secure: true,
-                            type: "user",
-                            maxAge: 24 * 60 * 60 * 1000,
-                        });
-                        const updatedDoc = { ...docs._doc, type: "user" };
-                        res.status(200).send(updatedDoc);
-                    } else {
-                        res.status(400).send("Password or email Incorrect");
-                    }
-                }
-            );
-        })
-        .catch((err) => {
-            res.send("User not registered");
+  Users.findOne({ email: body.email })
+    .then((docs) => {
+      if (!docs) {
+        return res.status(400).json({
+          message:
+            "Account not Found. Please try creating an account",
         });
+      }
+      bcrypt.compare(
+        body.password,
+        docs.password,
+        function (err, result) {
+          if (result) {
+            const token = jwt.sign(
+              {
+                id: docs._id.toString(),
+                type: "user",
+              },
+              process.env.TOKEN_SECRET_KEY,
+              { expiresIn: "5h" }
+            );
+            res.cookie("petlevert", token, {
+              httpOnly: true,
+              sameSite: "none",
+              secure: true,
+              type: "user",
+              maxAge: 24 * 60 * 60 * 1000,
+            });
+            const updatedDoc = { ...docs._doc, type: "user" };
+            res.status(200).send(updatedDoc);
+          } else {
+            res.status(400).send("Password or email Incorrect");
+          }
+        }
+      );
+    })
+    .catch((err) => {
+      res.send("User not registered");
+    });
 });
 
 router.post("/forgot-password", async (req, res) => {
@@ -151,7 +145,6 @@ router.post("/forgot-password", async (req, res) => {
         pass: "xzentliyxvefqpwl",
       },
     });
-
     const mailOptions = {
       from: "dhrupadsah@gmail.com",
       to: email,
@@ -207,90 +200,90 @@ router.post("/reset-password/:token", async (req, res) => {
 });
 
 router.post("/review", verify, (req, res) => {
-    const body = req.body;
-    const user_id = req._id;
-    const provider_id = body.provider_id;
-    const rating = body.rating;
-    const review = body.review;
-    Reviews.findOne({ user_id: user_id, provider_id: provider_id })
-        .then((doc) => {
-            if (!doc) {
-                const Review = new Reviews({
-                    rating: rating,
-                    review: review,
-                    user_id: user_id,
-                    provider_id: provider_id,
-                    verify: false,
-                });
-                return Review.save();
-            }
-            doc.rating = rating;
-            doc.review = review;
-            return doc.save();
-        })
-        .then((modified) => {
-            console.log(modified);
-            res.status(202).send("review saved sucessfully");
-        })
-        .catch((err) => {
-            res.status(500).send("error saving rating");
+  const body = req.body;
+  const user_id = req._id;
+  const provider_id = body.provider_id;
+  const rating = body.rating;
+  const review = body.review;
+  Reviews.findOne({ user_id: user_id, provider_id: provider_id })
+    .then((doc) => {
+      if (!doc) {
+        const Review = new Reviews({
+          rating: rating,
+          review: review,
+          user_id: user_id,
+          provider_id: provider_id,
+          verify: false,
         });
+        return Review.save();
+      }
+      doc.rating = rating;
+      doc.review = review;
+      return doc.save();
+    })
+    .then((modified) => {
+      console.log(modified);
+      res.status(202).send("review saved sucessfully");
+    })
+    .catch((err) => {
+      res.status(500).send("error saving rating");
+    });
 });
 
 router.post("/updateinfo", verify, async (req, res) => {
-    console.log("update account");
+  console.log("update account");
 
-    const body = req.body;
-    console.log(req._id, req.body);
-    let user = null;
-    try {
-        user = await Users.findById(req._id).exec();
-    } catch (err) {
-        return res.status(500).json({ message: "Internal error occurred!" });
-    }
-    user.name = body.name;
-    user.mobileNum = body.mobileNumber;
-    user.email = body.email;
-    user.city = body.city;
-    user.petParent = body.petParent;
-    const passwordCompare = await bcrypt.compare(
-        body.currentPassword,
-        user.password
-    );
-    if (!passwordCompare) {
-        return res.status(409).json({
-            message: "Wrong password entered : Cannot edit account details!",
-        });
-    }
-    if (body.newPassword && body.newPassword.length > 0) {
-        const hashedPassword = bcrypt.hashSync(body.newPassword, 10);
-        user.password = hashedPassword;
-    }
-    try {
-        await user.save();
-    } catch (err) {
-        return res.status(500).json({ message: "Internal error occurred!" });
-    }
-    const updatedDoc = { ...user._doc, type: "user" };
-    return res.status(200).json(updatedDoc);
+  const body = req.body;
+  console.log(req._id, req.body);
+  let user = null;
+  try {
+    user = await Users.findById(req._id).exec();
+  } catch (err) {
+    return res.status(500).json({ message: "Internal error occurred!" });
+  }
+  user.name = body.name;
+  user.mobileNum = body.mobileNumber;
+  user.email = body.email;
+  user.city = body.city;
+  user.petParent = body.petParent;
+  const passwordCompare = await bcrypt.compare(
+    body.currentPassword,
+    user.password
+  );
+  if (!passwordCompare) {
+    return res.status(409).json({
+      message: "Wrong password entered : Cannot edit account details!",
+    });
+  }
+  if (body.newPassword && body.newPassword.length > 0) {
+    const hashedPassword = bcrypt.hashSync(body.newPassword, 10);
+    user.password = hashedPassword;
+  }
+  try {
+    await user.save();
+  } catch (err) {
+    return res.status(500).json({ message: "Internal error occurred!" });
+  }
+  const updatedDoc = { ...user._doc, type: "user" };
+  return res.status(200).json(updatedDoc);
 });
 
 router.post("/updateimage", verify, async (req, res) => {
-    console.log("update image");
-    const { image } = req.body;
-    let user = null;
-    try {
-        user = await Users.findById(req._id).exec();
-    } catch (err) {
-        return res.status(500).json({ message: "Internal error occurred!" });
-    }
-    user.image = image;
-    try {
-        await user.save();
-    } catch (err) {
-        return res.status(500).json({ message: "Internal error occurred!" });
-    }
-    return res.status(200).json({ message: "Image updated successfully!" });
+  console.log("update image");
+  const { image } = req.body;
+  let user = null;
+  try {
+    user = await Users.findById(req._id).exec();
+  } catch (err) {
+    return res.status(500).json({ message: "Internal error occurred!" });
+  }
+  user.image = image;
+  try {
+    await user.save();
+  } catch (err) {
+    return res.status(500).json({ message: "Internal error occurred!" });
+  }
+  return res.status(200).json({ message: "Image updated successfully!" });
 });
 
 router.get("/info", verify, async (req, res) => {

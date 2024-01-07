@@ -39,24 +39,4 @@ router.get(
     }
 );
 
-router.get("/city/:city/:service", verify, async (req, res) => {
-    // let user = null;
-    // user = await Users.findOneById(req._id);
-
-    const { city, service } = req.params;
-
-    let providers = null;
-
-    providers = await Providers.find({
-        city: city,
-        services: { $in: [service] },
-    });
-
-    if (providers) {
-        res.status(200).json(providers);
-    } else {
-        res.status(400).send("No providers found");
-    }
-});
-
 module.exports = router;

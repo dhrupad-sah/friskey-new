@@ -20,7 +20,7 @@ mongoose
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.json());
 
 app.use(
@@ -37,30 +37,39 @@ app.get("/", (req, res) => {
     res.status(200).send("API working");
 });
 app.get("/check", verify, async (req, res) => {
-    const id = req._id;
     if (req._type === "provider") {
         var provider = null;
-        provider = await Providers.findById(req._id).exec();
-        if (!provider) {
-            return res.status(404).json({
-                message: "User Not Found",
-            });
+        try {
+            provider = await Providers.findOne({ _id: req._id });
+            console.log(provider);
+            if (!provider) {
+                return res.status(404).json({
+                    message: "User Not Found",
+                });
+            }
+            provider.type = "provider";
+            var modified_provider = { ...provider._doc, type: "provider" };
+            return res.status(200).json(modified_provider);
         }
-        provider.type = "provider";
-        var modified_provider = { ...provider._doc, type: "provider" };
-        return res.status(200).json(modified_provider);
+        catch {
+            return res.status(400).send('error finding provider!');
+        }
     }
     if (req._type === "user") {
         let user = null;
-        user = await Users.findById(req._id).exec();
-        if (!user) {
-            return res.status(404).json({
-                message: "User Not Found",
-            });
+        try {
+            user = await Users.findById(req._id).exec();
+            if (!user) {
+                return res.status(404).json({
+                    message: "User Not Found",
+                });
+            }
+            var modified_user = { ...user._doc, type: "user" };
+            console.log(modified_user);
+            return res.status(200).json(modified_user);
+        } catch {
+            return res.status(400).send('error finding user!')
         }
-        var modified_user = { ...user._doc, type: "user" };
-        console.log(modified_user);
-        return res.status(200).json(modified_user);
     }
 });
 app.use("/users", userRouter);
