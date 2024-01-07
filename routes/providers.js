@@ -5,11 +5,19 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const verify = require("../middleware/auth");
 const { default: jwtDecode } = require("jwt-decode");
-
+const nodemailer = require("nodemailer");
 const Users = require("../models/user");
 const Providers = require("../models/provider");
 const Services = require("../models/services");
 
+let config = {
+  service: "gmail",
+  auth: {
+    user: "hellopetlevert@gmail.com",
+    pass: "qdgzonbtfthnkavy",
+  },
+};
+let transporter = nodemailer.createTransport(config);
 const saltRounds = 10;
 
 router.post("/register", async (req, res) => {
@@ -20,7 +28,7 @@ router.post("/register", async (req, res) => {
   const userAlready = await Providers.findOne({ email: email });
 
   if (userAlready) {
-    res.status(403).send({ message: "user already exits!" });
+    res.status(403).send({ message: "Provider already exits!" });
   } else {
     bcrypt.hash(body.password, saltRounds, function (err, hash) {
       const provider = new Providers({
@@ -29,7 +37,7 @@ router.post("/register", async (req, res) => {
         email: body.email,
         password: hash,
         gender: body.gender,
-        country: body.city,
+        country: body.country,
         state: body.state,
         city: body.city,
         petParent: body.petParent,
@@ -64,11 +72,21 @@ router.post("/details", verify, async (req, res) => {
   const body = req.body;
   try {
     const provider = await Providers.findOne({ _id: provider_id });
+    const existingService = await Services.findOne({
+      providersId: provider._id,
+      serviceType: body.serviceType,
+      petType: body.petType,
+    });
+
+    if (existingService) {
+      return res.status(400).json({ message: 'Service with the same type and pet type already exists for this provider' });
+    }
 
     const service = new Services({
       serviceType: body.serviceType,
       providersId: provider._id,
-      price: body.currency + " " + body.price,
+      price: body.price,
+      priceTicker: body.currency,
       note: body.note,
       petType: [body.petType],
     });
@@ -85,6 +103,8 @@ router.post("/details", verify, async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+
 
 router.post("/login", async (req, res) => {
   const body = req.body;
@@ -188,11 +208,21 @@ router.get("/serviceDashboard", verify, async (req, res) => {
     res.status(404).send("No SERVICES found!!")
   }
 })
-
-router.get("/all", verify, (req, res) => {
-  Providers.find({}).then((docs) => {
-    res.status(200).json(docs);
+router.post("/contact", verify, (req, res) => {
+  console.log(req.body);
+  let message = {
+    from: 'hellopetlevert@gmail.com',
+    to: 'saipranithswargam@gmail.com',
+    subject: 'Regarding Pet Service Requirement',
+    html: '<p>Hello Testing</p>',
+  };
+  transporter.sendMail(message, (error, info) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+    console.log('Email sent: ' + info.response);
+    res.status(200).json({ message: 'Email sent successfully', info: info.response });
   });
 });
-
 module.exports = router;

@@ -11,6 +11,9 @@ const ServicesSchema = new mongoose.Schema({
   price: {
     type: String,
   },
+  priceTicker: {
+    type: String,
+  },
   note: {
     type: String,
   },
