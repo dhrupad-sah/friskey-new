@@ -11,8 +11,8 @@ const verify = require("./middleware/auth");
 const Providers = require("./models/provider");
 const Users = require("./models/user");
 mongoose
-       .connect("mongodb+srv://dhrupad_sah:vvtrX8ZQpCLr4YMn@cluster0.8gepm9r.mongodb.net/friskei?retryWrites=true&w=majority")
-    // .connect(process.env.MONGO_URL)
+    //    .connect("mongodb+srv://dhrupad_sah:vvtrX8ZQpCLr4YMn@cluster0.8gepm9r.mongodb.net/friskei?retryWrites=true&w=majority")
+    .connect(process.env.MONGO_URL)
     .then(() => console.log("DB connection successfull"))
     .catch((err) => {
         console.log(err);
