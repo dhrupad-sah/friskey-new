@@ -17,11 +17,11 @@ const ServicesSchema = new mongoose.Schema({
   note: {
     type: String,
   },
-  petType: [
-    {
-      type: String,
-    },
-  ],
+  petType:
+  {
+    type: String,
+  },
+
 });
 
 const Services = new mongoose.model("Services", ServicesSchema);

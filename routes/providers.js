@@ -88,7 +88,7 @@ router.post("/details", verify, async (req, res) => {
       price: body.price,
       priceTicker: body.currency,
       note: body.note,
-      petType: [body.petType],
+      petType: body.petType,
     });
 
     const newService = await service.save();
@@ -104,8 +104,54 @@ router.post("/details", verify, async (req, res) => {
   }
 });
 
+router.post("/updateService", async (req, res) => {
+  const { id, serviceType, petType, price, priceTicker } = req.body;
 
+  try {
+    const updatedService = await Services.findByIdAndUpdate(
+      id,
+      {
+        serviceType,
+        petType,
+        price,
+        priceTicker
+      },
+      { new: true }
+    );
+    console.log(updatedService);
+    if (!updatedService) {
+      return res.status(404).json({ error: "Service not found" });
+    }
 
+    console.log(updatedService);
+    res.send(updatedService);
+  } catch (error) {
+    console.error(error);
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.delete('/service/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+
+    const result = await Services.deleteOne({ id });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: `Service with ID ${id} has been deleted.` });
+    } else {
+      res.status(404).json({ message: `Service with ID ${id} not found.` });
+    }
+  } catch (error) {
+    console.error('Error deleting service:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 router.post("/login", async (req, res) => {
   const body = req.body;
 

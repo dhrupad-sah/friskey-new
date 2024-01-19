@@ -9,7 +9,7 @@ const Providers = require("../models/provider");
 const Services = require("../models/services");
 
 router.get(
-    "/:service/:longitude/:latitude/:distance/:pettype/:sort",
+    "/geolocation/:service/:longitude/:latitude/:distance/:pettype/:sort",
     verify,
     async (req, res) => {
         try {
@@ -34,7 +34,7 @@ router.get(
             });
 
             if (!providers || providers.length === 0) {
-                return res.status(404).json({ message: 'No providers found.' });
+                return res.status(200).json([]);
             }
 
             const providerIds = providers.map(provider => provider._id);
@@ -68,7 +68,7 @@ router.get(
 );
 
 
-router.get("/:service/:pettype/:country/:state/:city/:sort", verify, async (req, res) => {
+router.get("/citybased/:service/:pettype/:country/:state/:city/:sort", verify, async (req, res) => {
     try {
         const { country, state, city, pettype, service, sort } = req.params;
         console.log(req.params);
@@ -83,7 +83,7 @@ router.get("/:service/:pettype/:country/:state/:city/:sort", verify, async (req,
         console.log(matchingServices);
 
         if (matchingServices.length === 0) {
-            return res.status(404).json({ message: 'No services found.' });
+            return res.status(200).json([]);
         }
 
         const providerIds = matchingServices.map(service => service.providersId);
