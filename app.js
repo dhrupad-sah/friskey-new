@@ -11,8 +11,7 @@ const verify = require("./middleware/auth");
 const Providers = require("./models/provider");
 const Users = require("./models/user");
 mongoose
-    // .connect(process.env.MONGO_URL)
-    .connect("mongodb://localhost:27017/freskei")
+    .connect(process.env.MONGO_URL)
     .then(() => console.log("DB connection successfull"))
     .catch((err) => {
         console.log(err);
@@ -25,7 +24,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: ["http://localhost:3000", "https://freskei.netlify.app", "*"],
+        origin: ["http://localhost:3000", "https://freskei.netlify.app", "https://petlevert.com/", "*"],
         methods: ["POST", "GET", "HEAD", "PUT", "DELETE"],
         credentials: true,
     })
